@@ -2,75 +2,35 @@
 extern crate diesel;
 extern crate dotenv;
 
-use actix_web::{web, App, HttpResponse, HttpServer, Responder, get};
+use actix_web::{web, App, HttpServer};
 
-use diesel::prelude::*;
-use diesel::pg::PgConnection;
-use dotenv::dotenv;
-use std::env;
-
-
+pub mod handlers;
+pub mod db;
 pub mod models;
 pub mod schema;
 
-use models::*;
+use db::*;
 
-pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
-
-    let database_url = env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
-}
-
-pub fn create_post<'a>(conn: &PgConnection, username: &'a str, passwd: &'a str) -> User {
-    use schema::users;
-
-    let new_user = NewPost {
-        username: username,
-        passwd: passwd,
-    };
-
-    diesel::insert_into(users::table)
-        .values(&new_user)
-        .get_result(conn)
-        .expect("Error saving new post")
-}
-
-async fn status() -> impl Responder {
-    HttpResponse::Ok().body("Hello world!")
-}
-
-#[get("/hey")]
-async fn hey() -> impl Responder {
-    HttpResponse::Ok().body("Hey there!")
-}
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    use schema::users::dsl::*;
 
     let connection = establish_connection();
 
-    let user = create_post(&connection, "user", "pass");
-    println!("\nSaved user with id {}", user.id);
+    // Temp create user test
+    // let user = create_user(&connection, "user", "pass", "test@test.com");
+    // println!("\nSaved user with id {}", user.id);
 
-    let results = users.limit(5)
-        .load::<User>(&connection)
-        .expect("Error loading posts");
-
-    println!("Displaying {} users", results.len());
-    for post in results {
-        println!("{}", post.username);
-        println!("----------\n");
-        println!("{}", post.passwd);
-    }
-
+    display_db(&connection);
+    
     HttpServer::new(|| {
         App::new()
-            .route("/", web::get().to(status))
-            .service(hey)
+            .route("/", web::get().to(handlers::status))
+            .route("/users", web::get().to(handlers::get_users))
+            .route("/users/{id}", web::get().to(handlers::get_user_by_id))
+            .route("/users", web::post().to(handlers::add_user))
+            .route("/users/{id}", web::delete().to(handlers::delete_user))
+            .route("/users/update", web::post().to(handlers::update_user))
     })
     .bind("127.0.0.1:4000")?
     .run()
