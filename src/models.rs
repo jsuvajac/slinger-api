@@ -5,11 +5,13 @@ pub struct User {
     pub id: i32,
     pub username: String,
     pub passwd: String,
+    pub email: String,
 }
 
 #[derive(Insertable)]
 #[table_name="users"]
-pub struct NewPost<'a> {
+pub struct NewUser<'a> {
     pub username: &'a str,
     pub passwd: &'a str,
+    pub email: &'a str,
 }
