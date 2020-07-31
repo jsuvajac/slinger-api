@@ -11,25 +11,29 @@ pub async fn status() -> impl Responder {
 
 // Handler for GET /users
 pub async fn get_users() -> impl Responder {
-    format!("get users")
+    let connection = crate::db::establish_connection();
+    let out = crate::db::display_db(&connection);
+    
+    HttpResponse::Ok().body(out)
 }
-// Handler for GET /users
-pub async fn get_user_by_id() -> impl Responder {
-    format!("get users by id")
-}
+
 // Handler for POST /users
 pub async fn add_user(item: web::Json<InputUser>) -> impl Responder {
     let connection = crate::db::establish_connection();
-    crate::db::create_user(&connection, &item.username, &item.passwd, &item.email);
+    crate::db::create_user(&connection, &item.passwd, &item.email);
     format!("Created user: {:?}\n", item)
     // format!("add user")
 }
 // Handler for POST /users
-pub async fn update_user() -> impl Responder {
-    format!("update user")
+pub async fn update_user(item: web::Json<InputUser>) -> impl Responder {
+    // let connection = crate::db::establish_connection();
+    // crate::db::create_user(&connection, &item.passwd, &item.email);
+    format!("Update user: {:?}\n", item)
 }
 
 // Handler for DELETE /users
-pub async fn delete_user() -> impl Responder {
-    format!("delete user")
+pub async fn delete_user(item: web::Json<InputUser>) -> impl Responder {
+    let connection = crate::db::establish_connection();
+    crate::db::delete_user(&connection, &item.email);
+    format!("Deleted user: {:?}\n", item)
 }

@@ -1,5 +1,6 @@
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
+// use diesel::pg::upsert::*;
 use dotenv::dotenv;
 use std::env;
 
@@ -17,11 +18,10 @@ pub fn establish_connection() -> PgConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
-pub fn create_user<'a>(conn: &PgConnection, usr: &'a str, pass: &'a str, mail: &'a str) -> User {
+pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> User {
     use schema::users;
 
     let new_user = NewUser {
-        username: usr,
         passwd: pass,
         email: mail,
     };
@@ -32,6 +32,32 @@ pub fn create_user<'a>(conn: &PgConnection, usr: &'a str, pass: &'a str, mail: &
         .expect("Error saving new user")
 }
 
+/* 
+pub fn update_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) {
+    use schema::users;
+
+    let updated_user = NewUser {
+        passwd: pass,
+        email: mail,
+    };
+
+    diesel::update(&updated_user)
+        .set()
+        .get_result(conn)
+        .expect("Error saving new user")
+
+    updated_user
+}
+ */
+
+pub fn delete_user<'a>(conn: &PgConnection, mail: &'a str) {
+    // use schema::users;
+
+    diesel::delete(users.filter(email.like(mail)))
+        .execute(conn)
+        .expect("Error deleting user");
+}
+
 pub fn display_db(conn: &PgConnection) -> String{
     let results = users.limit(5)
         .load::<User>(conn)
@@ -39,9 +65,8 @@ pub fn display_db(conn: &PgConnection) -> String{
 
     let mut out = format!("Displaying {} users", results.len());
     for user in results {
-        out = format!("{}\n{}\n{}\n{}\n----------\n",
+        out = format!("{}\n{}\n{}\n----------\n",
                      out,
-                     user.username,
                      user.passwd,
                      user.email);
     }
