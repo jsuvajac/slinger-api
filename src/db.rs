@@ -1,6 +1,5 @@
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
-// use diesel::pg::upsert::*;
 use dotenv::dotenv;
 use std::env;
 
@@ -9,6 +8,7 @@ use crate::schema;
 use crate::models::*;
 use schema::users::dsl::*;
 
+// Wrapper for connecting to db -> TODO: user conn pool: r2d2
 pub fn establish_connection() -> PgConnection {
     dotenv().ok();
 
@@ -18,6 +18,7 @@ pub fn establish_connection() -> PgConnection {
         .expect(&format!("Error connecting to {}", database_url))
 }
 
+/// Create user based on email and passwd
 pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> User {
     use schema::users;
 
@@ -32,35 +33,27 @@ pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> Use
         .expect("Error saving new user")
 }
 
-/* 
-pub fn update_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) {
-    use schema::users;
+/// Update passwd
+pub fn update_user<'a>(conn: &PgConnection, new_pass: &'a str, mail: &'a str) -> User {
 
-    let updated_user = NewUser {
-        passwd: pass,
-        email: mail,
-    };
-
-    diesel::update(&updated_user)
-        .set()
+    let target = users.filter(email.eq(mail));
+    diesel::update(target)
+        .set(passwd.eq(new_pass))
         .get_result(conn)
-        .expect("Error saving new user")
+        .expect("Error updateing user")
 
-    updated_user
 }
- */
 
+/// Delete user from db
 pub fn delete_user<'a>(conn: &PgConnection, mail: &'a str) {
-    // use schema::users;
-
     diesel::delete(users.filter(email.like(mail)))
         .execute(conn)
         .expect("Error deleting user");
 }
 
+/// Get list of users
 pub fn display_db(conn: &PgConnection) -> String{
-    let results = users.limit(5)
-        .load::<User>(conn)
+    let results = users.load::<User>(conn)
         .expect("Error loading users");
 
     let mut out = format!("Displaying {} users", results.len());
