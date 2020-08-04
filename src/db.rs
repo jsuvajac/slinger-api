@@ -1,6 +1,5 @@
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
-use dotenv::dotenv;
 use std::env;
 
 
@@ -10,7 +9,6 @@ use schema::users::dsl::*;
 
 // Wrapper for connecting to db -> TODO: user conn pool: r2d2
 pub fn establish_connection() -> PgConnection {
-    dotenv().ok();
 
     let database_url = env::var("DATABASE_URL")
         .expect("DATABASE_URL must be set");

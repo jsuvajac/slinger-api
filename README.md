@@ -2,7 +2,6 @@
 backend for spell slinger
 ## `TODO`
 - logging
-- auth
 - jwt?
 - spell books
 - spell book loadouts
@@ -13,5 +12,3 @@ backend for spell slinger
 - update passwd
 - delete
 #### spell books
-
-### `auth`
