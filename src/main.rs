@@ -28,6 +28,7 @@ pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
 
 async fn bearer_auth_validator(req: ServiceRequest, auth: BearerAuth) -> Result<ServiceRequest, Error> {
+    log::debug!("authenticating: {}", auth.token());
     let config = req
         .app_data::<Config>()
         .map(|data| data.get_ref().clone())
@@ -65,11 +66,8 @@ async fn main() -> std::io::Result<()> {
 
     std::env::set_var("RUST_LOG", std::env::var("RUST_LOG").expect("RUST_LOG"));
     env_logger::init();
-    log::debug!("[root] debug");
-    log::info!("[root] info");
-    log::warn!("[root] warn");
-    log::error!("[root] error");
 
+    log::info!("starting server...");
     // Start Server
     HttpServer::new(move || {
         let auth = HttpAuthentication::bearer(bearer_auth_validator);

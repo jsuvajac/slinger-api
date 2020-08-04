@@ -9,7 +9,7 @@ use crate::Pool;
 pub async fn get_users(db: web::Data<Pool>) -> impl Responder {
     let connection = db.get().unwrap();
     let out = crate::db::display_db(&connection);
-    log::error!("test info log in get_users");
+    log::debug!("get_users triggered");
     HttpResponse::Ok().body(out)
 }
 
@@ -17,12 +17,14 @@ pub async fn get_users(db: web::Data<Pool>) -> impl Responder {
 pub async fn add_user(db: web::Data<Pool>, item: web::Json<InputUser>) -> impl Responder {
     let connection = db.get().unwrap();
     crate::db::create_user(&connection, &item.passwd, &item.email);
+    log::debug!("Created user: {:?}", item);
     format!("Created user: {:?}\n", item)
 }
 // Handler for POST /user
 pub async fn update_user(db: web::Data<Pool>, item: web::Json<InputUser>) -> impl Responder {
     let connection = db.get().unwrap();
     crate::db::update_user(&connection, &item.passwd, &item.email);
+    log::debug!("Updated user: {:?}", item);
     format!("Update user: {:?}\n", item)
 }
 
@@ -30,5 +32,6 @@ pub async fn update_user(db: web::Data<Pool>, item: web::Json<InputUser>) -> imp
 pub async fn delete_user(db: web::Data<Pool>, item: web::Json<InputUser>) -> impl Responder {
     let connection = db.get().unwrap();
     crate::db::delete_user(&connection, &item.email);
+    log::debug!("Deleted user: {:?}", item);
     format!("Deleted user: {:?}\n", item)
 }

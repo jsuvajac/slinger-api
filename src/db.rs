@@ -5,7 +5,6 @@ use crate::schema;
 use crate::models::*;
 use schema::users::dsl::*;
 
-
 /// Create user based on email and passwd
 pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> User {
     use schema::users;
@@ -23,7 +22,6 @@ pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> Use
 
 /// Update passwd
 pub fn update_user<'a>(conn: &PgConnection, new_pass: &'a str, mail: &'a str) -> User {
-
     let target = users.filter(email.eq(mail));
     diesel::update(target)
         .set(passwd.eq(new_pass))
