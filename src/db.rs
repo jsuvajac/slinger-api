@@ -1,20 +1,10 @@
 use diesel::prelude::*;
 use diesel::pg::PgConnection;
-use std::env;
-
 
 use crate::schema;
 use crate::models::*;
 use schema::users::dsl::*;
 
-// Wrapper for connecting to db -> TODO: user conn pool: r2d2
-pub fn establish_connection() -> PgConnection {
-
-    let database_url = env::var("DATABASE_URL")
-        .expect("DATABASE_URL must be set");
-    PgConnection::establish(&database_url)
-        .expect(&format!("Error connecting to {}", database_url))
-}
 
 /// Create user based on email and passwd
 pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> User {
