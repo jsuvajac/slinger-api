@@ -4,53 +4,24 @@ extern crate dotenv;
 extern crate log;
 extern crate env_logger;
 
-use actix_web::{dev::ServiceRequest, web, App, HttpServer, Error, middleware::Logger};
-
-use actix_web_httpauth::extractors::AuthenticationError;
-use actix_web_httpauth::extractors::bearer::{BearerAuth, Config};
+use actix_web::{web, App, HttpServer, middleware::Logger};
 use actix_web_httpauth::middleware::HttpAuthentication;
 
 use dotenv::dotenv;
-
-pub mod handlers;
-pub mod db;
-pub mod models;
-pub mod schema;
-
-
 use diesel::{
         prelude::*, 
         r2d2::{self, ConnectionManager}
     };
 
+pub mod handlers;
+pub mod db;
+pub mod models;
+pub mod schema;
+pub mod auth;
+
 // type alias to reduce verbosity
 pub type Pool = r2d2::Pool<ConnectionManager<PgConnection>>;
 
-
-async fn bearer_auth_validator(req: ServiceRequest, auth: BearerAuth) -> Result<ServiceRequest, Error> {
-    log::debug!("authenticating: {}", auth.token());
-    let config = req
-        .app_data::<Config>()
-        .map(|data| data.get_ref().clone())
-        .unwrap_or_else(Default::default);
-    match validate_token(auth.token()) {
-        Ok(res) => {
-            if res == true {
-                Ok(req)
-            } else {
-                Err(AuthenticationError::from(config).into())
-            }
-        }
-        Err(_) => Err(AuthenticationError::from(config).into()),
-    }
-}
-
-fn validate_token(token: &str) -> Result<bool, std::io::Error> {
-    if token.eq("test-token") {
-        return Ok(true);
-    }
-    return Err(std::io::Error::new(std::io::ErrorKind::Other, "Authentication failed!"));
-}
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -70,7 +41,7 @@ async fn main() -> std::io::Result<()> {
     log::info!("starting server...");
     // Start Server
     HttpServer::new(move || {
-        let auth = HttpAuthentication::bearer(bearer_auth_validator);
+        let auth = HttpAuthentication::bearer(auth::bearer_auth_validator);
         App::new()
             .data(pool.clone())
             .wrap(Logger::default())
