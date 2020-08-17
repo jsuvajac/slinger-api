@@ -1,10 +1,10 @@
-use actix_web_httpauth::extractors::AuthenticationError;
-use actix_web_httpauth::extractors::bearer::{BearerAuth, Config};
 use actix_web::{dev::ServiceRequest, Error};
+use actix_web_httpauth::extractors::bearer::{BearerAuth, Config};
+use actix_web_httpauth::extractors::AuthenticationError;
 
-use serde::{Serialize, Deserialize};
 use jsonwebtoken::errors::ErrorKind;
-use jsonwebtoken::{encode, decode, Header, Algorithm, Validation, EncodingKey, DecodingKey};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use serde::{Deserialize, Serialize};
 
 /// Our claims struct, it needs to derive `Serialize` and/or `Deserialize`
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,8 +15,11 @@ struct Claims {
 }
 
 pub fn gen_jwt() {
-    let my_claims =
-        Claims { sub: "b@b.com".to_owned(), company: "ACME".to_owned(), exp: 10000000000 };
+    let my_claims = Claims {
+        sub: "b@b.com".to_owned(),
+        company: "ACME".to_owned(),
+        exp: 10000000000,
+    };
     let key = b"secret";
 
     let mut header = Header::default();
@@ -44,7 +47,10 @@ pub fn gen_jwt() {
     log::debug!("{:?}", token_data.header);
 }
 
-pub async fn bearer_auth_validator(req: ServiceRequest, auth: BearerAuth) -> Result<ServiceRequest, Error> {
+pub async fn bearer_auth_validator(
+    req: ServiceRequest,
+    auth: BearerAuth,
+) -> Result<ServiceRequest, Error> {
     log::warn!("authenticating: {}", auth.token());
     gen_jwt();
     let config = req
@@ -68,6 +74,8 @@ fn validate_token(token: &str) -> Result<bool, std::io::Error> {
     if token.eq("test-token") {
         return Ok(true);
     }
-    return Err(std::io::Error::new(std::io::ErrorKind::Other, "Authentication failed!"));
+    return Err(std::io::Error::new(
+        std::io::ErrorKind::Other,
+        "Authentication failed!",
+    ));
 }
-

@@ -1,4 +1,4 @@
-use actix_web::{web, Responder, HttpResponse};
+use actix_web::{web, HttpResponse, Responder};
 
 use crate::models::*;
 use crate::Pool;

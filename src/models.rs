@@ -2,7 +2,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::schema::users;
 
-
 #[derive(Deserialize, Serialize, Queryable, Debug)]
 pub struct User {
     pub id: i32,
@@ -17,7 +16,7 @@ pub struct InputUser {
 }
 
 #[derive(Insertable)]
-#[table_name="users"]
+#[table_name = "users"]
 pub struct NewUser<'a> {
     pub passwd: &'a str,
     pub email: &'a str,
