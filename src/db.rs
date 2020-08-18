@@ -1,9 +1,13 @@
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use chrono::Utc;
 
 use crate::models::*;
 use crate::schema;
 use schema::users::dsl::*;
+
+// TODO: replace email with uuid
+// TODO: setup sessions based on uuid
 
 /// Create user based on email and passwd
 pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> User {
@@ -24,7 +28,7 @@ pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> Use
 pub fn update_user<'a>(conn: &PgConnection, new_pass: &'a str, mail: &'a str) -> User {
     let target = users.filter(email.eq(mail));
     diesel::update(target)
-        .set(passwd.eq(new_pass))
+        .set((passwd.eq(new_pass), updated_at.eq(&Utc::now().naive_utc())))
         .get_result(conn)
         .expect("Error updateing user")
 }
@@ -40,9 +44,9 @@ pub fn delete_user<'a>(conn: &PgConnection, mail: &'a str) {
 pub fn display_db(conn: &PgConnection) -> String {
     let results = users.load::<User>(conn).expect("Error loading users");
 
-    let mut out = format!("Displaying {} users", results.len());
+    let mut out = format!("num users: {}\n", results.len());
     for user in results {
-        out = format!("{}\n{:?}\n----------\n", out, user);
+        out = format!("{}{:?}\n", out, user);
     }
     out
 }

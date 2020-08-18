@@ -1,7 +1,9 @@
 # slinger-api
 backend for spell slinger
 ## `TODO`
-- jwt?
+- error handling
+- session caching
+- login/logout -> for session
 - spell books
 - spell book loadouts
 ### `api`

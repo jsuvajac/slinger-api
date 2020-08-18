@@ -35,3 +35,6 @@ pub async fn delete_user(db: web::Data<Pool>, item: web::Json<InputUser>) -> imp
     log::debug!("Deleted user: {:?}", item);
     format!("Deleted user: {:?}\n", item)
 }
+
+// TODO: login/ logout
+// TODO: spell book
