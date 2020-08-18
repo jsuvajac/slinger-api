@@ -42,7 +42,7 @@ pub fn display_db(conn: &PgConnection) -> String {
 
     let mut out = format!("Displaying {} users", results.len());
     for user in results {
-        out = format!("{}\n{}\n{}\n----------\n", out, user.passwd, user.email);
+        out = format!("{}\n{:?}\n----------\n", out, user);
     }
     out
 }

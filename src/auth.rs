@@ -52,7 +52,7 @@ pub async fn bearer_auth_validator(
     auth: BearerAuth,
 ) -> Result<ServiceRequest, Error> {
     log::warn!("authenticating: {}", auth.token());
-    gen_jwt();
+    // gen_jwt();
     let config = req
         .app_data::<Config>()
         .map(|data| data.get_ref().clone())

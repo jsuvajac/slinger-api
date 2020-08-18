@@ -1,7 +1,9 @@
 table! {
     users (id) {
-        id -> Int4,
+        id -> Uuid,
         passwd -> Varchar,
         email -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
     }
 }

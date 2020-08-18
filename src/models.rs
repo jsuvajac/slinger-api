@@ -1,12 +1,16 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
+use chrono::NaiveDateTime;
 
 use crate::schema::users;
 
 #[derive(Deserialize, Serialize, Queryable, Debug)]
 pub struct User {
-    pub id: i32,
+    pub id: Uuid,
     pub passwd: String,
     pub email: String,
+    pub created_at: NaiveDateTime,
+    pub updated_at: NaiveDateTime
 }
 
 #[derive(Deserialize, Serialize, Debug)]
