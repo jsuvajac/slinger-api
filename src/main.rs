@@ -4,8 +4,10 @@ extern crate dotenv;
 extern crate env_logger;
 extern crate log;
 
+use actix_redis::RedisSession;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use actix_web_httpauth::middleware::HttpAuthentication;
+// use actix_session::Session;
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 use diesel::{
@@ -48,16 +50,20 @@ async fn main() -> std::io::Result<()> {
     log::info!("starting server...");
     // Start Server
     HttpServer::new(move || {
-        let auth = HttpAuthentication::bearer(auth::bearer_auth_validator);
+        let _auth = HttpAuthentication::bearer(auth::bearer_auth_validator);
         App::new()
             .data(pool.clone())
             .wrap(Logger::default())
-            .wrap(auth)
-            .route("/", web::get().to(handlers::get_users))
-            .route("/user", web::get().to(handlers::get_users))
-            .route("/user", web::put().to(handlers::add_user))
-            .route("/user", web::delete().to(handlers::delete_user))
-            .route("/user", web::post().to(handlers::update_user))
+            .wrap(RedisSession::new("127.0.0.1:6379", &[0; 32]))
+            .service(
+                web::resource("/user")
+                    .route(web::get().to(handlers::get_users))
+                    .route(web::put().to(handlers::add_user))
+                    .route(web::delete().to(handlers::delete_user))
+                    .route(web::post().to(handlers::update_user)),
+            )
+            .route("/login", web::post().to(handlers::login))
+            .route("/logout", web::post().to(handlers::logout))
     })
     .bind_openssl("127.0.0.1:4000", builder)?
     .run()

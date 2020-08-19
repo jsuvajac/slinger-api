@@ -1,6 +1,6 @@
+use chrono::Utc;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
-use chrono::Utc;
 
 use crate::models::*;
 use crate::schema;
@@ -20,6 +20,7 @@ pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> Use
 
     diesel::insert_into(users::table)
         .values(&new_user)
+        .on_conflict_do_nothing()
         .get_result(conn)
         .expect("Error saving new user")
 }
