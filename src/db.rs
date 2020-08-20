@@ -20,7 +20,6 @@ pub fn create_user<'a>(conn: &PgConnection, pass: &'a str, mail: &'a str) -> Use
 
     diesel::insert_into(users::table)
         .values(&new_user)
-        .on_conflict_do_nothing()
         .get_result(conn)
         .expect("Error saving new user")
 }
@@ -42,6 +41,11 @@ pub fn delete_user<'a>(conn: &PgConnection, mail: &'a str) {
 }
 
 /// Get list of users
+pub fn get_user_by_email<'a>(conn: &PgConnection, mail: &'a str) -> User {
+    users.filter(email.eq(mail)).get_result(conn).expect("Error finding specific user")
+}
+
+/// Get list of users -- for debuging
 pub fn display_db(conn: &PgConnection) -> String {
     let results = users.load::<User>(conn).expect("Error loading users");
 

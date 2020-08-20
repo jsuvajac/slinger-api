@@ -7,7 +7,7 @@ extern crate log;
 use actix_redis::RedisSession;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 use actix_web_httpauth::middleware::HttpAuthentication;
-// use actix_session::Session;
+// use actix_session::{CookieSession, Session};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
 use diesel::{
@@ -54,7 +54,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(pool.clone())
             .wrap(Logger::default())
-            .wrap(RedisSession::new("127.0.0.1:6379", &[0; 32]))
+            .wrap(RedisSession::new("127.0.0.1:6379", &[0; 32])
+                .cookie_name("user")
+                .cookie_secure(true)
+            )
             .service(
                 web::resource("/user")
                     .route(web::get().to(handlers::get_users))
