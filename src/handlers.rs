@@ -4,7 +4,11 @@ use actix_session::Session;
 use actix_web::{web, Error, HttpResponse, Responder};
 
 // Handler for POST /login
-pub async fn login(db: web::Data<Pool>, item: web::Json<InputUser>, session: Session) -> Result<impl Responder, Error> {
+pub async fn login(
+    db: web::Data<Pool>,
+    item: web::Json<InputUser>,
+    session: Session,
+) -> Result<impl Responder, Error> {
     log::debug!("login triggered");
     log::debug!("{:?}", item);
 
@@ -69,7 +73,6 @@ pub async fn delete_user(
     item: web::Json<InputUser>,
     session: Session,
 ) -> Result<impl Responder, Error> {
-
     log::debug!("Deleted user: {:?}", item);
     validate_session(&session).unwrap();
 
@@ -90,7 +93,7 @@ pub fn validate_session(session: &Session) -> Result<String, std::io::Error> {
         None => Err(std::io::Error::new(
             std::io::ErrorKind::Other,
             "Authentication failed!",
-        ))
+        )),
     }
 }
 

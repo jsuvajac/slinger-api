@@ -16,7 +16,6 @@ use diesel::{
 };
 use dotenv::dotenv;
 
-pub mod auth;
 pub mod db;
 pub mod handlers;
 pub mod models;
@@ -54,9 +53,10 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .data(pool.clone())
             .wrap(Logger::default())
-            .wrap(RedisSession::new("127.0.0.1:6379", &[0; 32])
-                .cookie_name("user")
-                .cookie_secure(true)
+            .wrap(
+                RedisSession::new("127.0.0.1:6379", &[0; 32])
+                    .cookie_name("user")
+                    .cookie_secure(true),
             )
             .service(
                 web::resource("/user")
