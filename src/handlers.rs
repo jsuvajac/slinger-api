@@ -19,7 +19,7 @@ pub async fn login(
     // check if user exists
     log::info!("stored {:?}", session.set("user", &item.email));
 
-    Ok(format!("login\n"))
+    Ok("login\n")
 }
 
 // Handler for POST /logout
@@ -29,7 +29,7 @@ pub async fn logout(session: Session) -> Result<impl Responder, Error> {
 
     session.purge();
 
-    Ok(format!("logout\n"))
+    Ok("logout\n")
 }
 
 // Handler for GET /user

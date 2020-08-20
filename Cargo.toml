@@ -11,7 +11,6 @@ actix-web = { version = "2.0", features = ["openssl"] }
 actix-rt = "1.0"
 actix-redis = "0.8.2"
 actix-session = "0.3.0"
-actix-web-httpauth = "0.4.1"
 uuid = { version = "0.8", features = ["serde", "v4"] }
 chrono = { version = "0.4", features = ["serde"] }
 openssl = { version = "0.10", features = ["v110"] }

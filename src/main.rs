@@ -6,7 +6,6 @@ extern crate log;
 
 use actix_redis::RedisSession;
 use actix_web::{middleware::Logger, web, App, HttpServer};
-use actix_web_httpauth::middleware::HttpAuthentication;
 // use actix_session::{CookieSession, Session};
 use openssl::ssl::{SslAcceptor, SslFiletype, SslMethod};
 
@@ -49,7 +48,6 @@ async fn main() -> std::io::Result<()> {
     log::info!("starting server...");
     // Start Server
     HttpServer::new(move || {
-        let _auth = HttpAuthentication::bearer(auth::bearer_auth_validator);
         App::new()
             .data(pool.clone())
             .wrap(Logger::default())
