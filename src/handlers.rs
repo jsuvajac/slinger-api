@@ -26,9 +26,8 @@ pub async fn login(
 pub async fn logout(session: Session) -> Result<impl Responder, Error> {
     log::debug!("logout triggered");
     validate_session(&session).unwrap();
-
+    // Clear session and cookie
     session.purge();
-
     Ok("logout\n")
 }
 
@@ -61,7 +60,7 @@ pub async fn update_user(
 ) -> Result<impl Responder, Error> {
     log::debug!("Updated user: {:?}", item);
     validate_session(&session).unwrap();
-
+    // TODO: Validate the given data
     let connection = db.get().unwrap();
     crate::db::update_user(&connection, &item.passwd, &item.email);
     Ok(format!("Update user: {:?}\n", item))
@@ -75,7 +74,8 @@ pub async fn delete_user(
 ) -> Result<impl Responder, Error> {
     log::debug!("Deleted user: {:?}", item);
     validate_session(&session).unwrap();
-
+    // Clear session and cookie
+    session.purge();
     let connection = db.get().unwrap();
     crate::db::delete_user(&connection, &item.email);
     Ok(format!("Deleted user: {:?}\n", item))
