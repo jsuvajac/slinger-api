@@ -23,8 +23,8 @@ print_req('update user pass', r)
 r = session.post(url+'/logout', verify=False)
 print_req('logout', r)
 
-# r = session.get(url+'/user', verify=False)
-# print_req('get user', r)
+r = session.get(url+'/user', verify=False)
+print_req('get user', r)
 
 # r = session.delete(url+'/user', json={'passwd': '111', 'email': 'foo1@bars.com'}, verify=False)
 # print_req('delete user', r)
