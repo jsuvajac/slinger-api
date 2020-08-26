@@ -13,6 +13,13 @@ pub struct User {
     pub updated_at: NaiveDateTime,
 }
 
+#[derive(Deserialize, Serialize, Queryable, Debug)]
+pub struct SpellBook {
+    pub id: Uuid,
+    pub name: String,
+    pub content: String,
+}
+
 #[derive(Insertable)]
 #[table_name = "users"]
 pub struct NewUser<'a> {
