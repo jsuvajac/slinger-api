@@ -2,9 +2,9 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 CREATE TABLE SPELL_BOOK (
-  id UUID NOT NULL PRIMARY KEY,
-  name VARCHAR NOT NULL,
+  user_id UUID NOT NULL,
+  name VARCHAR NOT NULL PRIMARY KEY,
   content VARCHAR NOT NULL,
-  foreign key (id) references users(id)
+  foreign key (user_id) references users(id)
 )
 

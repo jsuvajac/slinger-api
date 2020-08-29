@@ -5,6 +5,8 @@ use crate::errors::AppError;
 use crate::models::*;
 use crate::Pool;
 
+
+/// Authentication
 // Handler for POST /login
 pub async fn login(
     db: web::Data<Pool>,
@@ -19,6 +21,7 @@ pub async fn login(
     log::debug!("Match: {:?}", target);
 
     // check if user exists
+    // TODO: validate passwd
     log::info!("stored {:?}", session.set("user", &item.email));
 
     Ok("login\n")
@@ -39,6 +42,24 @@ pub async fn logout(session: Session) -> Result<impl Responder, AppError> {
     }
 }
 
+// checks if the session is in session storage
+pub fn validate_session(session: &Session) -> Result<String, AppError> {
+    let msg = "Could not retrieve user from session";
+    let user_id = session
+        .get::<String>("user")
+        .map_err(|_| AppError::AuthenticationError(String::from(msg)))
+        .unwrap();
+    match user_id {
+        Some(id) => {
+            log::debug!("session {} renewed", id);
+            session.renew();
+            Ok(id)
+        }
+        None => Err(AppError::AuthenticationError(String::from(msg))),
+    }
+}
+
+/// User
 // Handler for GET /user
 pub async fn get_users(db: web::Data<Pool>, session: Session) -> Result<impl Responder, AppError> {
     log::debug!("get_users triggered");
@@ -110,20 +131,27 @@ pub async fn delete_user(
     }
 }
 
-pub fn validate_session(session: &Session) -> Result<String, AppError> {
-    let msg = "Could not retrieve user from session";
-    let user_id = session
-        .get::<String>("user")
-        .map_err(|_| AppError::AuthenticationError(String::from(msg)))
-        .unwrap();
-    match user_id {
-        Some(id) => {
-            log::debug!("session {} renewed", id);
-            session.renew();
-            Ok(id)
+
+// Handler for PUT /spellbook
+pub async fn add_spell_book(
+    db: web::Data<Pool>,
+    item: web::Json<InputSpellBook>,
+    session: Session,
+) -> Result<impl Responder, AppError> {
+    log::debug!("add_spell_book triggered");
+
+    match validate_session(&session) {
+        Ok(user) => {
+            log::info!("spell book: {:?}", item);
+            log::info!("user form session token: {:?}", user);
+            let connection = db.get().unwrap();
+            let user = crate::db::get_user_by_email(&connection, &user);
+            log::info!("user after lookup: {:?}", user);
+            crate::db::create_spell_book(&connection, &user.id, &item.name, &item.content);
+            Ok(format!("Created spell book: {:?}\n", item))
         }
-        None => Err(AppError::AuthenticationError(String::from(msg))),
+        Err(_) => Err(AppError::AuthenticationError(String::from(
+            "Could not retrieve user from session",
+        ))),
     }
 }
-
-// TODO: spell book

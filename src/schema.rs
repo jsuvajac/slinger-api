@@ -1,6 +1,6 @@
 table! {
-    spell_book (id) {
-        id -> Uuid,
+    spell_book (name) {
+        user_id -> Uuid,
         name -> Varchar,
         content -> Varchar,
     }
@@ -16,7 +16,7 @@ table! {
     }
 }
 
-joinable!(spell_book -> users (id));
+joinable!(spell_book -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     spell_book,

@@ -1,10 +1,12 @@
 use chrono::Utc;
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
+use uuid::Uuid;
 
 use crate::models::*;
 use crate::schema;
 use schema::users::dsl::*;
+use schema::spell_book::dsl::*;
 
 // TODO: replace email with uuid
 // TODO: setup sessions based on uuid
@@ -58,3 +60,19 @@ pub fn display_db(conn: &PgConnection) -> String {
     }
     out
 }
+
+/// Create user based on email and passwd
+pub fn create_spell_book<'a>(conn: &PgConnection, uuid: &'a Uuid, book_name: &'a str, book_content: &'a str) -> SpellBook {
+    use schema::spell_book;
+    let new_user = NewSpellBook {
+        user_id: uuid,
+        name: book_name,
+        content: book_content,
+    };
+
+    diesel::insert_into(spell_book::table)
+        .values(&new_user)
+        .get_result(conn)
+        .expect("Error saving new user")
+}
+
