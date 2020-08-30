@@ -21,12 +21,14 @@ pub struct NewUser<'a> {
     pub passwd: &'a str,
     pub email: &'a str,
 }
-
-// for incoming requesets json storage
 #[derive(Deserialize, Serialize, Debug)]
 pub struct InputUser {
     pub passwd: String,
     pub email: String,
+}
+#[derive(Deserialize, Serialize, Debug)]
+pub struct UpdateUser {
+    pub passwd: String,
 }
 
 
@@ -37,8 +39,6 @@ pub struct SpellBook {
     pub name: String,
     pub content: String,
 }
-
-
 #[derive(Insertable)]
 #[table_name = "spell_book"]
 pub struct NewSpellBook<'a> {
@@ -46,11 +46,9 @@ pub struct NewSpellBook<'a> {
     pub name: &'a str,
     pub content: &'a str,
 }
-
 // for incoming requesets json storage
 #[derive(Deserialize, Serialize, Debug)]
 pub struct InputSpellBook {
     pub name: String,
     pub content: String,
 }
-

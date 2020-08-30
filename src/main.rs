@@ -59,7 +59,6 @@ async fn main() -> std::io::Result<()> {
             )
             .service(
                 web::resource("/user")
-                    .route(web::get().to(handlers::get_users))
                     .route(web::put().to(handlers::add_user))
                     .route(web::delete().to(handlers::delete_user))
                     .route(web::post().to(handlers::update_user)),

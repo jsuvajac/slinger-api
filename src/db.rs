@@ -73,6 +73,6 @@ pub fn create_spell_book<'a>(conn: &PgConnection, uuid: &'a Uuid, book_name: &'a
     diesel::insert_into(spell_book::table)
         .values(&new_user)
         .get_result(conn)
-        .expect("Error saving new user")
+        .expect("Error creating spell book")
 }
 

@@ -23,11 +23,6 @@
 ### POST
     Update passwd
 *-- requires authentication*
-### GET
-    Currently gets all user in db
-TODO: Remove
-
-*-- requires authentication*
 ### DELETE
     Purges session (cookie and redis) and deletes the user
 TODO: remove all spell books 
