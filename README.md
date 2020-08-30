@@ -29,9 +29,10 @@ TODO: remove all spell books
 
 *-- requires authentication*
 ## `/spellbook`
-### PUT
-    Create new spell book for existing user
-*-- requires authentication*
+*-- all require authentication*
 ### GET
     Get all spell books of current user
-*-- requires authentication*
+### PUT
+    Create new spell book for existing user
+### POST
+    Update content of a spell book

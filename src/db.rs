@@ -83,13 +83,25 @@ pub fn create_spell_book<'a>(
 }
 
 /// Get list of users
-pub fn get_spell_book<'a>(
+pub fn get_spell_books<'a>(
     conn: &PgConnection,
     uuid: &'a Uuid,
 ) -> Result<Vec<SpellBook>, diesel::result::Error> {
-    // spell_book
-    //     .filter(user_id.eq(uuid))
-    //     .get_result(conn)
-    //     .expect("Error finding spell books")
     spell_book.filter(user_id.eq(uuid)).load::<SpellBook>(conn)
+}
+
+/// Update Spell Book
+pub fn update_spell_book<'a>(
+    conn: &PgConnection,
+    uuid: &'a Uuid,
+    book_name: &'a str,
+    updated_content: &'a str,
+) -> Result<SpellBook, diesel::result::Error>  {
+    let target = spell_book
+        .filter(user_id.eq(uuid))
+        .filter(name.eq(book_name));
+    diesel::update(target)
+        .set(content.eq(updated_content))
+        .get_result(conn)
+    
 }

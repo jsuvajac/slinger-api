@@ -24,6 +24,13 @@ print_req('login', r)
 r = session.get(url+'/spellbook',  verify=False)
 print_req('get_book', r)
 
+r = session.post(url+'/spellbook', json={'name': 'book0', 'content': '!!!'}, verify=False)
+print_req('create_book', r)
+
+r = session.get(url+'/spellbook',  verify=False)
+print_req('get_book', r)
+
+
 # r = session.delete(url+'/user', json={'email': 'foo1@bars.com'}, verify=False)
 # print_req('delete user', r)
 
