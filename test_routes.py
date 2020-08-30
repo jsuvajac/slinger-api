@@ -17,8 +17,12 @@ print_req('login', r)
 # r = session.post(url+'/user', json={'passwd': 'usr123'}, verify=False)
 # print_req('update user pass', r)
 
-r = session.put(url+'/spellbook', json={'name': 'book5', 'content': '!@#!@#'}, verify=False)
-print_req('create_book', r)
+# for i in range(5):
+#     r = session.put(url+'/spellbook', json={'name': 'book'+str(i), 'content': '!@#!@#'+str(i)}, verify=False)
+#     print_req('create_book', r)
+
+r = session.get(url+'/spellbook',  verify=False)
+print_req('get_book', r)
 
 # r = session.delete(url+'/user', json={'email': 'foo1@bars.com'}, verify=False)
 # print_req('delete user', r)

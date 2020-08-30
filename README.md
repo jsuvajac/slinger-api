@@ -1,5 +1,5 @@
 # Backend server for spell slinger
-- User and Spell-Book dbs
+- User and Spell-Book storage
 - Authentication via http-only session tokens after login
 ## Tools
 - framework -> actix
@@ -31,4 +31,7 @@ TODO: remove all spell books
 ## `/spellbook`
 ### PUT
     Create new spell book for existing user
+*-- requires authentication*
+### GET
+    Get all spell books of current user
 *-- requires authentication*

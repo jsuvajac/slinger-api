@@ -1,13 +1,13 @@
 use actix_web::{HttpResponse, ResponseError};
 use derive_more::Display;
-use diesel::result::{DatabaseErrorKind, Error as DBError};
-use std::convert::From;
-use uuid::Error as UuidError;
 
 #[derive(Debug, Display)]
 pub enum AppError {
     #[display(fmt = "DuplicateValue: {}", _0)]
     DuplicateValue(String),
+
+    #[display(fmt = "DuplicateValue: {}", _0)]
+    NoDataFound(String),
 
     #[display(fmt = "BadId")]
     BadId,
@@ -27,26 +27,7 @@ impl ResponseError for AppError {
             }
             AppError::DuplicateValue(ref message) => HttpResponse::BadRequest().json(message),
             AppError::GenericError(ref message) => HttpResponse::BadRequest().json(message),
-        }
-    }
-}
-impl From<UuidError> for AppError {
-    fn from(_: UuidError) -> AppError {
-        AppError::BadId
-    }
-}
-impl From<DBError> for AppError {
-    fn from(error: DBError) -> AppError {
-        // We only care about UniqueViolations
-        match error {
-            DBError::DatabaseError(kind, info) => {
-                let message = info.details().unwrap_or_else(|| info.message()).to_string();
-                match kind {
-                    DatabaseErrorKind::UniqueViolation => AppError::DuplicateValue(message),
-                    _ => AppError::GenericError(message),
-                }
-            }
-            _ => AppError::GenericError(String::from("Some database error occured")),
+            AppError::NoDataFound(ref message) => HttpResponse::NoContent().json(message),
         }
     }
 }

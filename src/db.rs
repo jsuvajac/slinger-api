@@ -5,8 +5,9 @@ use uuid::Uuid;
 
 use crate::models::*;
 use crate::schema;
-use schema::users::dsl::*;
 use schema::spell_book::dsl::*;
+use schema::users::dsl::*;
+use std::vec::Vec;
 
 // TODO: replace email with uuid
 // TODO: setup sessions based on uuid
@@ -62,7 +63,12 @@ pub fn display_db(conn: &PgConnection) -> String {
 }
 
 /// Create user based on email and passwd
-pub fn create_spell_book<'a>(conn: &PgConnection, uuid: &'a Uuid, book_name: &'a str, book_content: &'a str) -> SpellBook {
+pub fn create_spell_book<'a>(
+    conn: &PgConnection,
+    uuid: &'a Uuid,
+    book_name: &'a str,
+    book_content: &'a str,
+) -> SpellBook {
     use schema::spell_book;
     let new_user = NewSpellBook {
         user_id: uuid,
@@ -76,3 +82,14 @@ pub fn create_spell_book<'a>(conn: &PgConnection, uuid: &'a Uuid, book_name: &'a
         .expect("Error creating spell book")
 }
 
+/// Get list of users
+pub fn get_spell_book<'a>(
+    conn: &PgConnection,
+    uuid: &'a Uuid,
+) -> Result<Vec<SpellBook>, diesel::result::Error> {
+    // spell_book
+    //     .filter(user_id.eq(uuid))
+    //     .get_result(conn)
+    //     .expect("Error finding spell books")
+    spell_book.filter(user_id.eq(uuid)).load::<SpellBook>(conn)
+}

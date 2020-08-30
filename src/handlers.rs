@@ -1,5 +1,6 @@
 use actix_session::Session;
 use actix_web::{web, HttpResponse, Responder};
+use serde_json;
 
 use crate::errors::AppError;
 use crate::models::*;
@@ -22,7 +23,7 @@ pub async fn login(
     if target.passwd == item.passwd {
         session.set("user", &item.email).unwrap();
         log::debug!("{:} -- login", &item.email);
-        Ok("login\n")
+        Ok(HttpResponse::Ok().body("Logged in"))
     } else {
         Err(AppError::AuthenticationError(String::from(
             "Invalid user name of password",
@@ -37,9 +38,9 @@ pub async fn logout(session: Session) -> Result<impl Responder, AppError> {
             // Clear session and cookie
             log::debug!("{} -- logout", user_email);
             session.purge();
-            Ok("logout\n")
+            Ok(HttpResponse::Ok().body("Logged out"))
         }
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
 
@@ -71,7 +72,7 @@ pub async fn add_user(
     let connection = db.get().unwrap();
     // TODO: Validate the given data
     crate::db::create_user(&connection, &item.passwd, &item.email);
-    Ok("Created user\n")
+    Ok(HttpResponse::Ok().body("User created"))
 }
 
 // Handler for POST /user
@@ -80,16 +81,15 @@ pub async fn update_user(
     item: web::Json<UpdateUser>,
     session: Session,
 ) -> Result<impl Responder, AppError> {
-
     match validate_session(&session) {
         Ok(user_email) => {
             // TODO: Validate the given data
             let connection = db.get().unwrap();
             crate::db::update_user(&connection, &item.passwd, &user_email);
             log::debug!("Updated user: {}", user_email);
-            Ok("Update user\n")
+            Ok(HttpResponse::Ok().body("Update user"))
         }
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
 
@@ -98,7 +98,6 @@ pub async fn delete_user(
     db: web::Data<Pool>,
     session: Session,
 ) -> Result<impl Responder, AppError> {
-
     match validate_session(&session) {
         Ok(user_email) => {
             // Clear session and cookie
@@ -106,12 +105,11 @@ pub async fn delete_user(
             let connection = db.get().unwrap();
             crate::db::delete_user(&connection, &user_email);
             log::debug!("Deleted user: {}", user_email);
-            Ok("Deleted user\n")
+            Ok(HttpResponse::Ok().body("Deleted user"))
         }
-        Err(e) => Err(e)
+        Err(e) => Err(e),
     }
 }
-
 
 // Handler for PUT /spellbook
 pub async fn add_spell_book(
@@ -126,8 +124,30 @@ pub async fn add_spell_book(
             crate::db::create_spell_book(&connection, &user.id, &item.name, &item.content);
             // TODO: handle dup spell books
             log::debug!("created new spell book {:?}", item);
-            Ok(format!("Created spell book: {:?}\n", item))
+            Ok(HttpResponse::Ok().body("Created spell book"))
         }
-        Err(e) => Err(e)
+        Err(e) => Err(e),
+    }
+}
+
+// GET /spellbook
+pub async fn get_spell_book(
+    db: web::Data<Pool>,
+    session: Session,
+) -> Result<impl Responder, AppError> {
+    match validate_session(&session) {
+        Ok(user_email) => {
+            let connection = db.get().unwrap();
+            let user = crate::db::get_user_by_email(&connection, &user_email);
+            match crate::db::get_spell_book(&connection, &user.id) {
+                Ok(books) => {
+                    let json = serde_json::to_string(&books).unwrap();
+                    log::info!("got {:}", json);
+                    Ok(HttpResponse::Ok().body(json))
+                }
+                Err(_) => Err(AppError::NoDataFound(String::from("no Spellbook found"))),
+            }
+        }
+        Err(e) => Err(e),
     }
 }
