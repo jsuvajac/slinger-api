@@ -96,12 +96,22 @@ pub fn update_spell_book<'a>(
     uuid: &'a Uuid,
     book_name: &'a str,
     updated_content: &'a str,
-) -> Result<SpellBook, diesel::result::Error>  {
+) -> Result<SpellBook, diesel::result::Error> {
     let target = spell_book
         .filter(user_id.eq(uuid))
         .filter(name.eq(book_name));
     diesel::update(target)
         .set(content.eq(updated_content))
         .get_result(conn)
-    
+}
+
+/// Delete Spell book
+pub fn delete_spell_book<'a>(conn: &PgConnection, uuid: &'a Uuid, book_name: &'a str) {
+    diesel::delete(
+        spell_book
+            .filter(user_id.eq(uuid))
+            .filter(name.like(book_name)),
+    )
+    .execute(conn)
+    .expect("Error deleting user");
 }

@@ -1,6 +1,5 @@
 use actix_session::Session;
 use actix_web::{web, HttpResponse, Responder};
-use serde_json;
 
 use crate::errors::AppError;
 use crate::models::*;
@@ -165,11 +164,26 @@ pub async fn update_spell_book(
             let connection = db.get().unwrap();
             let user = crate::db::get_user_by_email(&connection, &user_email);
             match crate::db::update_spell_book(&connection, &user.id, &item.name, &item.content) {
-                Ok(books) => {
-                    Ok(HttpResponse::Ok().body("updated spell book"))
-                }
+                Ok(_) => Ok(HttpResponse::Ok().body("updated spell book")),
                 Err(_) => Err(AppError::NoDataFound(String::from("no Spellbook found"))),
             }
+        }
+        Err(e) => Err(e),
+    }
+}
+
+// DELETE /spellbook
+pub async fn delete_spell_book(
+    db: web::Data<Pool>,
+    item: web::Json<DeleteSpellBook>,
+    session: Session,
+) -> Result<impl Responder, AppError> {
+    match validate_session(&session) {
+        Ok(user_email) => {
+            let connection = db.get().unwrap();
+            let user = crate::db::get_user_by_email(&connection, &user_email);
+            crate::db::delete_spell_book(&connection, &user.id, &item.name);
+            Ok(HttpResponse::Ok().body("deleted spell book"))
         }
         Err(e) => Err(e),
     }

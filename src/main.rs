@@ -67,7 +67,7 @@ async fn main() -> std::io::Result<()> {
                 web::resource("/spellbook")
                     .route(web::get().to(handlers::get_spell_book))
                     .route(web::put().to(handlers::add_spell_book))
-                    // .route(web::delete().to(handlers::delete_spell_book))
+                    .route(web::delete().to(handlers::delete_spell_book))
                     .route(web::post().to(handlers::update_spell_book)),
             )
             .route("/login", web::post().to(handlers::login))

@@ -36,3 +36,5 @@ TODO: remove all spell books
     Create new spell book for existing user
 ### POST
     Update content of a spell book
+### DELETE
+    delete spell book

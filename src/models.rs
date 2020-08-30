@@ -57,3 +57,9 @@ pub struct InputSpellBook {
     pub name: String,
     pub content: String,
 }
+
+// for incoming requesets json storage
+#[derive(Deserialize, Serialize, Debug)]
+pub struct DeleteSpellBook {
+    pub name: String,
+}

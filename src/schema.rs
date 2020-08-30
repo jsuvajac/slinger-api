@@ -18,7 +18,4 @@ table! {
 
 joinable!(spell_book -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(
-    spell_book,
-    users,
-);
+allow_tables_to_appear_in_same_query!(spell_book, users,);
