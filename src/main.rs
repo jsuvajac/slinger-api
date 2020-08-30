@@ -4,6 +4,7 @@ extern crate dotenv;
 extern crate env_logger;
 extern crate log;
 
+use actix_cors::Cors;
 use actix_redis::RedisSession;
 use actix_web::{middleware::Logger, web, App, HttpServer};
 // use actix_session::{CookieSession, Session};
@@ -57,6 +58,10 @@ async fn main() -> std::io::Result<()> {
                     .cookie_name("user")
                     .cookie_secure(true),
             )
+            .wrap(
+                Cors::new()
+                .finish()
+            )
             .service(
                 web::resource("/user")
                     .route(web::put().to(handlers::add_user))
@@ -73,7 +78,8 @@ async fn main() -> std::io::Result<()> {
             .route("/login", web::post().to(handlers::login))
             .route("/logout", web::post().to(handlers::logout))
     })
-    .bind_openssl("127.0.0.1:4000", builder)?
+    //.bind_openssl("127.0.0.1:4000", builder)?
+    .bind("127.0.0.1:4000")?
     .run()
     .await
 }
